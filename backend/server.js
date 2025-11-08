@@ -1,3 +1,4 @@
+require('dotenv').config(); // must be first
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -9,12 +10,15 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB connection
-mongoose.connect('mongodb://mongo:27017/dockerlearn', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log("✅ Connected to MongoDB"))
-.catch(err => console.error("MongoDB error:", err));
+const mongoUri = process.env.MONGO_URL;
+if (!mongoUri) {
+  console.error("❌ MONGO_URL is not defined in .env");
+  process.exit(1);
+}
+
+mongoose.connect(mongoUri)
+  .then(() => console.log("✅ Connected to MongoDB Atlas"))
+  .catch(err => console.error("❌ MongoDB connection error:", err));
 
 // Simple route
 app.get('/api/hello', (req, res) => {
